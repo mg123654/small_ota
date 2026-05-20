@@ -11,18 +11,18 @@
 extern "C" {
 #endif
 typedef enum {
-    STATE_IDLE = 0,
-    STATE_CONNECT,
-    STATE_DISCONNECT,
-    STATE_CONNECT_ERROR
-    
+    MSTA_DISCONNECTED = 0,
+    MSTA_CONNECTING,
+    MSTA_CONNECTED,
+    MSTA_ERROR
+
 } net_dev_msta_t;
 
 typedef enum {
-    STATE_IDLE = 0,
-    STATE_BUSY,
-    STATE_SSTA_ERROR,
-    STATE_TIMEOUT
+    SSTA_IDLE = 0,
+    SSTA_BUSY,
+    SSTA_ERROR,
+    SSTA_TIMEOUT
 } net_dev_ssta_t;
 
 typedef struct {
@@ -65,6 +65,7 @@ void net_dev_close(void);
  * @param buf      output buffer (size >= len)
  * @return  actual bytes received (>0), 0 = closed, -1 = error
  */
+
 int net_dev_http_get_range(uint32_t offset, uint16_t len, uint8_t *buf);
 
 #ifdef __cplusplus

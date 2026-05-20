@@ -3,9 +3,7 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 /* =============== OTA constants =============== */
 #define OTA_SLICE_DATA_SIZE        512        /* data bytes per slice */
@@ -29,8 +27,6 @@ typedef struct {
     char     url[CONFIG_OTA_URL_MAX];
 } ota_config_t;
 
-#ifdef __cplusplus
-}
-#endif
+
 
 #endif /* _OTA_TYPES_H_ */

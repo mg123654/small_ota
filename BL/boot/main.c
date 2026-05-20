@@ -1,7 +1,41 @@
 #include "bl.h"
+/*整个流程采用同步设计，全部都为阻塞操作，使用单线程模式*/
 
 void main(void)
 {
+    /*
+    
+    平台硬件初始化 
+    
+    */
+
+    fal_init();
+
+
+
+
+    //读取配置分区参数
+
+    //参数检查，是否已有app分区，如果没有直接进行进入ota模式。
+
+
+
+    //如果有app分区，判断ota使能参数，使能则进入ota模式，否则跳转到app。
+
+    //ota模式，需要进行网络回调注册，设备初始化，
+
+
+
+
+
+
+
+
+
+
+
+
+
     const struct fal_partition *app_part;
     ota_config_t cfg;
 

@@ -1,4 +1,5 @@
 #include "net_dev.h"
+#include <stdio.h>
 #include <string.h>
 #include "lib.h"
 /*ring buffer*/
@@ -10,7 +11,25 @@ ring_buffer_t *rb = &net_rb;
 net_dev_t net_dev_m;
 net_dev_t* net_dev = &net_dev_m;
 
+net_drv_ops_t drv_ops;
+
 static int net_opened = 0;
+
+
+/* =============== driver registration =============== */
+
+/**
+ * Set the driver operations. Must be called before net_dev_open().
+ * Typically called by the porting layer.
+ */
+int net_drv_register(const net_drv_ops_t *ops)
+{
+    if (ops == NULL) {
+        return -1;
+    }
+    memcpy(&drv_ops, ops, sizeof(net_drv_ops_t));
+    return 0;
+}
 
 
 /* skip HTTP headers and return pointer to body start in ring.
@@ -47,6 +66,21 @@ static int skip_http_header(ring_buffer_t *rb)  // 需要传入 rb
 }
 
 
+/* read a single byte from ring buffer, fall back to driver recv with timeout */
+static int ring_read_byte(uint32_t timeout_ms)
+{
+    if (!ring_buffer_is_empty(rb)) {
+        uint8_t c;
+        ring_buffer_read(rb, &c, 1);
+        return (int)c;
+    }
+    if (drv_ops.recv_byte) {
+        return drv_ops.recv_byte(timeout_ms);
+    }
+    return -1;
+}
+
+
 /* =============== public API =============== */
 
 
@@ -55,8 +89,8 @@ int net_dev_init(net_dev_t*net_dev)
     ring_buffer_init(rb,net_ring_buffer,RING_BUFFER_SIZE);
     memset(net_dev->recv_buf,0,sizeof(net_dev->recv_buf));
     memset(net_dev->send_buf,0,sizeof(net_dev->send_buf));
-    net_dev->msta=STATE_DISCONNECT;
-    net_dev->ssta=STATE_IDLE;
+    net_dev->msta=MSTA_DISCONNECTED;
+    net_dev->ssta=SSTA_IDLE;
 }
 
 
@@ -68,13 +102,11 @@ int net_dev_open(const char *url)
     }
 
     /* init ring buffer */
-    ring_flush();
+    ring_buffer_clear(rb);
 
     /* initialize hardware */
-    if (drv_ops.init()) {
-        if (drv_ops.init() != 0) {
-            return -1;
-        }
+    if (drv_ops.init && drv_ops.init() != 0) {
+        return -1;
     }
 
     net_opened = 1;
@@ -109,7 +141,7 @@ int net_dev_http_get_range(uint32_t offset, uint16_t len, uint8_t *buf)
     }
 
     /* flush ring buffer before new request */
-    ring_flush();
+    ring_buffer_clear(rb);
 
     /* build HTTP Range GET request */
     req_len = snprintf(request, sizeof(request),
@@ -147,17 +179,3 @@ int net_dev_http_get_range(uint32_t offset, uint16_t len, uint8_t *buf)
     return len;
 }
 
-/* =============== driver registration =============== */
-
-/**
- * Set the driver operations. Must be called before net_dev_open().
- * Typically called by the porting layer.
- */
-int net_drv_register(const net_drv_ops_t *ops)
-{
-    if (ops == NULL) {
-        return -1;
-    }
-    memcpy(&drv_ops, ops, sizeof(net_drv_ops_t));
-    return 0;
-}

@@ -1,8 +1,7 @@
 /**
  * Low-level driver operations.
  * Implement these for your UART/SPI/I2C hardware.
- * All operations are synchronous (blocking).
- * you need to use send_bytes() to ring_buffer or ring_buffer() of net_dev in interrupt or other tasks to communicate with tcp server.
+ * All operations are synchronous (blocking) besides net_read_msg();
  * 
  */
 
@@ -12,7 +11,6 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "lib.h"
-extern ring_buffer_t rb;
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,24 +42,11 @@ typedef struct {
      */
     int  (*send)(const uint8_t *data,size_t len);
 
-    /**
-     * Receive one byte from hardware (blocking with timeout).
-     * @param timeout_ms  max wait time in milliseconds, 0 = no wait
-     * @return byte value (0..255), -1 = timeout / no data
-     */
-    int  (*recv_byte)(uint32_t timeout_ms);
 
-} net_drv_ops_t;
+}net_drv_ops_t;
 
-/*connect to server ,this func will be call in a while block*/
-int connect_to_TCPServer();
-
-/*send msg to TCPServer*/
-int TCP_send_msg();
-
-/*throw msg to ring buffer*/
-int TCP_read_msg(ring_buffer_t* rb);
-
+/*transport msg to ring buffer,this should be call in interrupt or as a task*/
+int net_read_msg(ring_buffer_t* rb);
 
 
 #ifdef __cplusplus

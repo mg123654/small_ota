@@ -15,7 +15,7 @@ typedef struct {
 void ring_buffer_init(ring_buffer_t *rb, uint8_t *buf, uint32_t size);
 void ring_buffer_clear(ring_buffer_t *rb);
 bool ring_buffer_is_empty(ring_buffer_t *rb);
-uint32_t get_ring_buffer_available(ring_buffer_t *rb);  // 获取可读数据量
+uint32_t ring_buffer_available(ring_buffer_t *rb);  // 获取可读数据量
 
 
 // 读写函数
