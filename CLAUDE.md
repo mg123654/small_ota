@@ -61,7 +61,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │  - net_dev_init()               │  使用 lib_ring_buffer 作为缓冲区
 │  - net_dev_open()               │  HTTP 头解析用自建状态机
 │  - net_dev_http_get_range()     │
-│  - net_dev_close()              │
 │  - net_drv_register()           │
 └──────────┬──────────────────────┘
            │
@@ -69,9 +68,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 │  驱动适配层 (net_drv_port)        │  UART/SPI/I2C 具体实现
 │  - net_drv_ops_t 回调注册        │  封装 AT 指令或自定义帧
 │  - init / deinit / send         │  中断接收写入 ring buffer
-│  - recv_byte (带超时)            │  TCP 辅助函数（stub，待实现）
-│  - connect_to_TCPServer         │
-│  - TCP_send_msg / TCP_read_msg  │
+│  - net_read_msg(rb)             │  从 ring buffer 读取网络数据
 └──────────┬──────────────────────┘
            │
    ┌───────┴───────┐

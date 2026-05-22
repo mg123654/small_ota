@@ -2,7 +2,7 @@
 #define _NET_DEV_H_
 
 #include <stdint.h>
-#include "../net_drv_port/net_drv.h"
+#include "../net_drv_port/net_drv_port.h"
 
 #define RING_BUFFER_SIZE 1024
 
@@ -50,23 +50,8 @@ int net_dev_init(net_dev_t * net_dev);
  */
 int net_dev_open(const char *url);
 
-/**
- * Close network device and release hardware.
- */
-void net_dev_close(void);
 
-/**
- * HTTP Range GET — blocking.
- * Sends GET with Range: bytes=offset-(offset+len-1), waits for response,
- * extracts only the body data into buf.
- *
- * @param offset   byte offset of range start
- * @param len      number of bytes to request
- * @param buf      output buffer (size >= len)
- * @return  actual bytes received (>0), 0 = closed, -1 = error
- */
 
-int net_dev_http_get_range(uint32_t offset, uint16_t len, uint8_t *buf);
 
 #ifdef __cplusplus
 }
